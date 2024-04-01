@@ -3,20 +3,21 @@ package org.example
 /**
  * A self-balancing search tree.
  * Currently only supports insertion and lookup.
+ * @param T a comparable type representing the keys to store
  */
-class RBTree {
-    private var root: RBTreeNode? = null
+class RBTree<T: Comparable<T>> {
+    private var root: RBTreeNode<T>? = null
 
     /**
-     * An internal class that
-     * @param k the integer value to store
+     * An internal class that represents a node in our RBTree
+     * @param k the value to store
      * @param isBlack true if black and false otherwise
      */
-    private class RBTreeNode(val k: Int,
-                             var isBlack: Boolean) {
-        var parent: RBTreeNode? = null
-        var leftChild: RBTreeNode? = null
-        var rightChild: RBTreeNode? = null
+    private class RBTreeNode<T: Comparable<T>>(val k: T,
+                                               var isBlack: Boolean) {
+        var parent: RBTreeNode<T>? = null
+        var leftChild: RBTreeNode<T>? = null
+        var rightChild: RBTreeNode<T>? = null
 
         /**
          * @return if this node is a left child of its parent
@@ -36,7 +37,7 @@ class RBTree {
     /**
      * @return true if the tree contains the query
      */
-    operator fun contains(q: Int): Boolean {
+    operator fun contains(q: T): Boolean {
         root?.let {
             return checkIn(it, q)
         } ?: run {
@@ -49,7 +50,7 @@ class RBTree {
      * @param subtree the subtree to search through
      * @param q the query to look for
      */
-    private fun checkIn(subtree: RBTreeNode, q: Int):Boolean {
+    private fun checkIn(subtree: RBTreeNode<T>, q: T):Boolean {
         if (subtree.k == q) {
             return true
         } else if (subtree.k > q) {
@@ -71,8 +72,8 @@ class RBTree {
      * Insert the [newValue] into the tree
      * @param newValue the value to insert
      */
-    fun insert(newValue: Int) {
-        val new = RBTreeNode(k = newValue, isBlack = false)
+    fun insert(newValue: T) {
+        val new = RBTreeNode<T>(k = newValue, isBlack = false)
         root?.let {
             insertHelper(new, it)
         } ?: run {
@@ -86,7 +87,7 @@ class RBTree {
      * @param new the node to insert
      * @param curr the subtree to insert into
      */
-    private fun insertHelper(new: RBTreeNode, curr: RBTreeNode) {
+    private fun insertHelper(new: RBTreeNode<T>, curr: RBTreeNode<T>) {
         if (curr.k > new.k) {
             // move it down the left subtree
             curr.leftChild?.let { leftChild ->
@@ -106,7 +107,7 @@ class RBTree {
         }
     }
 
-    private fun insertFixup(startWith: RBTreeNode) {
+    private fun insertFixup(startWith: RBTreeNode<T>) {
         var z = startWith
         while (z.parent != null && !z.parent?.isBlack!!) {
             if (z.parent == z.parent?.parent?.leftChild) {
@@ -152,7 +153,7 @@ class RBTree {
      * Rotate the node [x] to the left
      * @param x the node to rotate
      */
-    private fun leftRotate(x: RBTreeNode) {
+    private fun leftRotate(x: RBTreeNode<T>) {
         val y = x.rightChild
         x.rightChild = y?.leftChild
 
@@ -178,7 +179,7 @@ class RBTree {
      * Rotate the node [x] to the right
      * @param x the node to rotate
      */
-    private fun rightRotate(x: RBTreeNode) {
+    private fun rightRotate(x: RBTreeNode<T>) {
         val y = x.leftChild
         x.leftChild = y?.rightChild
 
@@ -213,7 +214,7 @@ class RBTree {
      * @param node the subtree to print
      * @param indent the number of spaces to use as indentation
      */
-    private fun printHelper(node: RBTreeNode?, indent: Int) {
+    private fun printHelper(node: RBTreeNode<T>?, indent: Int) {
         val indentString = " ".repeat(indent)
         if (node == null) {
             println("${indentString}null")
@@ -243,10 +244,12 @@ class RBTree {
     /**
      * @return true if the binary search property is met
      */
-    private fun isBST(n: RBTreeNode?): Boolean {
+    private fun isBST(n: RBTreeNode<T>?): Boolean {
         if (n != null) {
-            return (n.k >= (n.leftChild?.k ?: Int.MIN_VALUE) ||
-                    n.k <= (n.rightChild?.k ?: Int.MAX_VALUE))
+            val nLeftChild = n.leftChild
+            val nRightChild = n.rightChild
+            return ((nLeftChild == null || nLeftChild.k <= n.k) &&
+                    (nRightChild == null || nRightChild.k > n.k))
         } else {
             return true
         }
@@ -262,7 +265,7 @@ class RBTree {
     /**
      * @return the height of the subtree rooted at [n]
      */
-    private fun getHeightHelper(n: RBTreeNode?):Int {
+    private fun getHeightHelper(n: RBTreeNode<T>?):Int {
         return if (n != null) {
             1 + maxOf(getHeightHelper(n.leftChild), getHeightHelper(n.rightChild))
         } else {
@@ -273,7 +276,7 @@ class RBTree {
     /**
      * Verifies property 3 which is that no red node can have a black child
      */
-    private fun checkProperty3(n: RBTreeNode?): Boolean {
+    private fun checkProperty3(n: RBTreeNode<T>?): Boolean {
         if (n != null) {
             val leftChildBlack = n.leftChild?.isBlack ?: true
             val rightChildBlack = n.leftChild?.isBlack ?: true
@@ -292,7 +295,7 @@ class RBTree {
      * the root to a leaf is always the same
      * @return true if the invariant is satisfied and false otherwise
      */
-    private fun checkProperty4(n: RBTreeNode?): Boolean {
+    private fun checkProperty4(n: RBTreeNode<T>?): Boolean {
         if (n != null) {
             val r = getProperty4(n.leftChild)
             val s = getProperty4(n.rightChild)
@@ -308,7 +311,7 @@ class RBTree {
      * @param n the subtree to check
      * @return the number of black nodes from teh subtree to each leaf
      */
-    private fun getProperty4(n: RBTreeNode?): Int {
+    private fun getProperty4(n: RBTreeNode<T>?): Int {
         if (n != null) {
             val r = getProperty4(n.leftChild)
             val s = getProperty4(n.rightChild)

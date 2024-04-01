@@ -2,7 +2,7 @@ package org.example
 import java.util.Random
 
 fun main() {
-    val tree = RBTree()
+    val tree = RBTree<Int>()
     val random = Random()
     val asList: MutableList<Int> = mutableListOf()
 
@@ -17,7 +17,7 @@ fun main() {
         assert(v in tree)
     }
 
-    val t2 = RBTree()
+    val t2 = RBTree<Int>()
     t2.insert(2)
     t2.insert(3)
     t2.insert(-1)
