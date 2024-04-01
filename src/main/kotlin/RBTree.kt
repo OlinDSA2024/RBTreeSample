@@ -52,7 +52,6 @@ class RBTree {
 
     private fun insertFixup(startWith: RBTreeNode) {
         var z = startWith
-        var zParent = z.parent
         while (z.parent != null && !z.parent?.isBlack!!) {
             if (z.parent == z.parent?.parent?.leftChild) {
                 val y = z.parent?.parent?.rightChild
