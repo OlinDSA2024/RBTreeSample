@@ -17,9 +17,11 @@ fun main() {
         assert(v in tree)
     }
 
+    // do a worst-case unit test
     val t2 = RBTree<Int>()
-    t2.insert(2)
-    t2.insert(3)
-    t2.insert(-1)
-    t2.print()
+    for (i in 0 until 1000000) {
+        t2.insert(i)
+    }
+    println("height: ${t2.getHeight()}")
+    t2.checkInvariants()
 }
