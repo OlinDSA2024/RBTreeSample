@@ -111,11 +111,11 @@ class RBTree<T: Comparable<T>> {
         var z: RBTreeNode<T>? = startWith
         // we keep looping until z's parent is black
         while (z?.parent?.isBlack == false) {
-            if (z.parent == z.parent?.parent?.leftChild) {
+            if (z.parent?.isLeftChild() == true) {
                 val uncle = z.parent?.parent?.rightChild
                 val uncleIsBlack = (uncle?.isBlack) ?: true
                 if (!uncleIsBlack) { // z's parent and uncle are both red
-                    // this is case 1 (solve with recoloring)
+                    // case 1
                     z.parent?.isBlack = true
                     uncle?.isBlack = true
                     z.parent?.parent?.isBlack = false
@@ -123,26 +123,31 @@ class RBTree<T: Comparable<T>> {
                     z = z.parent?.parent
                 } else {
                     if (z.isRightChild()) {
+                        // case 2
                         z = z.parent!!
                         leftRotate(z)
                     }
+                    // case 3
                     z.parent?.isBlack = true
                     z.parent?.parent?.isBlack = false
-                    rightRotate(z.parent!!.parent!!)
+                    rightRotate(z.parent?.parent!!)
                 }
             } else {
                 val uncle = z.parent?.parent?.leftChild
                 val uncleIsBlack = uncle?.isBlack ?: true
                 if (!uncleIsBlack) {
+                    // case 1
                     z.parent?.isBlack = true
                     uncle?.isBlack = true
                     z.parent?.parent?.isBlack = false
                     z = z.parent?.parent!!
                 } else {
                     if (z.isLeftChild()) {
+                        // case 2
                         z = z.parent!!
                         rightRotate(z)
                     }
+                    // case 3
                     z.parent?.isBlack = true
                     z.parent?.parent?.isBlack = false
                     leftRotate(z.parent?.parent!!)
