@@ -108,16 +108,19 @@ class RBTree<T: Comparable<T>> {
     }
 
     private fun insertFixup(startWith: RBTreeNode<T>) {
-        var z = startWith
-        while (z.parent != null && !z.parent?.isBlack!!) {
+        var z: RBTreeNode<T>? = startWith
+        // we keep looping until z's parent is black
+        while (z?.parent?.isBlack == false) {
             if (z.parent == z.parent?.parent?.leftChild) {
                 val uncle = z.parent?.parent?.rightChild
                 val uncleIsBlack = (uncle?.isBlack) ?: true
-                if (!uncleIsBlack) {
+                if (!uncleIsBlack) { // z's parent and uncle are both red
+                    // this is case 1 (solve with recoloring)
                     z.parent?.isBlack = true
                     uncle?.isBlack = true
                     z.parent?.parent?.isBlack = false
-                    z = z.parent?.parent!!
+                    // keep checking with the grandparent
+                    z = z.parent?.parent
                 } else {
                     if (z.isRightChild()) {
                         z = z.parent!!
@@ -156,16 +159,13 @@ class RBTree<T: Comparable<T>> {
     private fun leftRotate(x: RBTreeNode<T>) {
         val y = x.rightChild
         x.rightChild = y?.leftChild
-
-        if (y?.leftChild != null) {
-            y.leftChild?.parent = x
-        }
+        y?.leftChild?.parent = x
 
         val xParent = x.parent       // this local variable helps with type safety
         y?.parent = xParent
         if (xParent == null) {
             root = y
-        } else if (x == xParent.leftChild) {
+        } else if (x.isLeftChild()) {
             xParent.leftChild = y
         } else {
             xParent.rightChild = y
@@ -182,16 +182,13 @@ class RBTree<T: Comparable<T>> {
     private fun rightRotate(x: RBTreeNode<T>) {
         val y = x.leftChild
         x.leftChild = y?.rightChild
-
-        if (y?.rightChild != null) {
-            y.rightChild?.parent = x
-        }
+        y?.rightChild?.parent = x
 
         val xParent = x.parent       // this local variable helps with type safety
         y?.parent = xParent
         if (xParent == null) {
             root = y
-        } else if (x == xParent.rightChild) {
+        } else if (x.isRightChild()) {
             xParent.rightChild = y
         } else {
             xParent.leftChild = y
